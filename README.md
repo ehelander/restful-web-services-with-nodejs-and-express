@@ -236,3 +236,78 @@ Jonathan Mills
   ```
 
 - Open browser to [localhost:4000/api/books](localhost:4000/api/books)
+
+### [Filtering with a Query String](https://app.pluralsight.com/course-player?clipId=30f00928-05f6-4f89-8f8d-eb1b97ae9ffe)
+
+- We want to add a query string parameter via Mongoose `find`.
+- In `app.js`:
+
+  ```js
+  bookRouter.route('/books').get(req, res) => {
+    // Takes the query string and creates an object out of it.
+    const { query } = req;
+    // Pass the query to Mongo
+    Book.find(query, (err, books) => {
+      if (err) {
+        return res.send(err);
+      }
+      return res.json(books);
+    });
+  });
+  ```
+
+- But passing a bad query parameter breaks the query, since it gets passed along to Mongo.
+- In `app.js`:
+
+  ```js
+  bookRouter.route('/books').get((req, res) => {
+    const { query } = {};
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+    Book.find(query, (err, books) => {
+      if (err) {
+        return res.send(err);
+      }
+      return res.json(books);
+    });
+  });
+  ```
+
+### [Getting a Single Item](https://app.pluralsight.com/course-player?clipId=386c084b-8589-4288-9d28-7140954bd401)
+
+- Find a single item: We want to get a book by its ID.
+- Add a second route in `app.js`):
+
+  ```js
+  bookRouter.route('/books').get((req, res) => {
+    const { query } = {};
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+    Book.find(query, (err, books) => {
+      if (err) {
+        return res.send(err);
+      }
+      return res.json(books);
+    });
+  });
+  // The `/:bookId` gives us a `bookId` variable we can reference.
+  bookRouter.route('/books/:bookId').get((req, res) => {
+    const { query } = {};
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+    // Use `findById` instead; use the `bookId` param.
+    Book.findById(req.params.bookId, (err, book) => {
+      if (err) {
+        return res.send(err);
+      }
+      return res.json(book);
+    });
+  });
+  ```
+
+- Open browser: [http://localhost:4000/api/books/5e92303babc885b4634c9436](http://localhost:4000/api/books/5e92303babc885b4634c9436)
+
+### [Summary](https://app.pluralsight.com/course-player?clipId=4cb80ef9-0957-4afb-896e-d831ab944d0d)
