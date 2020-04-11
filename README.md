@@ -110,8 +110,27 @@ app.listen(port, () => {
           - Run `npm run lint`
             - Change `var`s to `const`s.
             - Format Document to fix other issues.
-        - 
   - nodemod
-    - Handles restarting application, passing in the port, etc.
+    - Handles restarting application automatically if anything changes, passing in the port, etc.
+    - Run `npm install nodemon`
+    - Add script: `"start": "nodemon app.js"`
+    - Add `package.json` `"nodemonConfig"` section:
 
-### [Summary]()
+      ```json
+      {
+        "restartable": "rs",
+        "ignore": [
+          "node_modules/**/node_modules"
+        ],
+        "delay": "2500", // delay before restarting app
+        "env": {
+          "NODE_ENV": "development",
+          "PORT": 4000
+        }
+      }
+      ```
+
+    - Run `npm start`
+      - And we're now running on port 4000.
+
+### [Summary](https://app.pluralsight.com/course-player?clipId=73b7f212-75b8-420b-928d-5ac6b6bc5991)
