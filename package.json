@@ -4,6 +4,7 @@
   "description": "https://app.pluralsight.com/player?course=node-js-express-rest-web-services-update&amp;author=jonathan-mills&amp;name=0f46065d-05a4-4cc6-80e7-807b90981b21&amp;clip=0&amp;mode=live",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write \"**/*.js\"",
     "lint": "eslint .",
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,12 +21,14 @@
   "homepage": "https://github.com/ehelander/restful-web-services-with-nodejs-and-express#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "mongoose": "^5.9.7",
     "nodemon": "^2.0.3"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.2"
+    "eslint-plugin-import": "^2.20.2",
+    "prettier": "^2.0.4"
   },
   "nodemonConfig": {
     "restartable": "rs",

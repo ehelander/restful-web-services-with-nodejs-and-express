@@ -1,10 +1,10 @@
-# RESTful Web Services with Node.js and Express]
+# [RESTful Web Services with Node.js and Express](https://app.pluralsight.com/library/courses/node-js-express-rest-web-services-update)
 
 Jonathan Mills
 
 ## [Course Overview](https://app.pluralsight.com/player?course=node-js-express-rest-web-services-update&author=jonathan-mills&name=0f46065d-05a4-4cc6-80e7-807b90981b21&clip=0&mode=live)
 
-## What is REST?
+## What is REST
 
 ### [Introduction](https://app.pluralsight.com/course-player?clipId=e5aa2f4d-e8c2-4c38-b330-d99dd6ebab4d)
 
@@ -82,16 +82,17 @@ app.get('/', (request, response) => {
 // Listen on our port.
 app.listen(port, () => {
   console.log('Running on port', port);
-})
+});
 ```
 
 - Fire it up
   - Run `node app.js`
-- Open browser for port (localhost:3000)
+- Open browser to [localhost:3000](localhost:3000)
 
 ### [Setting up Some Tooling](https://app.pluralsight.com/course-player?clipId=eb0ad853-4326-47c6-a565-a9642894b8b5)
 
 - Tools
+
   - eslint
     - Run `npm i eslint -D`
       - `-D` adds it to our `devDependencies`.
@@ -102,7 +103,7 @@ app.listen(port, () => {
         - Run `npm run lint -- --init`
           - Everything after `--`: Pass on everything following it to the eslint. So this passes `--init` to `eslint`.
             - Style guide: Airbnb
-              - Note: https://www.npmjs.com/package/eslint-config-airbnb-base
+              - Note: [https://www.npmjs.com/package/eslint-config-airbnb-base](https://www.npmjs.com/package/eslint-config-airbnb-base)
                 - Run `npx install-peerdeps --dev eslint-config-airbnb-base`
             - React: N
             - JavaScript config file
@@ -111,6 +112,7 @@ app.listen(port, () => {
             - Change `var`s to `const`s.
             - Format Document to fix other issues.
   - nodemod
+
     - Handles restarting application automatically if anything changes, passing in the port, etc.
     - Run `npm install nodemon`
     - Add script: `"start": "nodemon app.js"`
@@ -119,9 +121,7 @@ app.listen(port, () => {
       ```json
       {
         "restartable": "rs",
-        "ignore": [
-          "node_modules/**/node_modules"
-        ],
+        "ignore": ["node_modules/**/node_modules"],
         "delay": "2500", // delay before restarting app
         "env": {
           "NODE_ENV": "development",
@@ -134,3 +134,97 @@ app.listen(port, () => {
       - And we're now running on port 4000.
 
 ### [Summary](https://app.pluralsight.com/course-player?clipId=73b7f212-75b8-420b-928d-5ac6b6bc5991)
+
+## Getting Data
+
+### [Introduction](https://app.pluralsight.com/course-player?clipId=2b8bac75-392a-4102-9a6c-2ec5313ef12a)
+
+- We will implement the HTTP GET verb for getting a list of items or a single item
+- Wire up MongoDB with Mongoose
+- Search for items
+
+### [Implementing HTTP GET](https://app.pluralsight.com/course-player?clipId=1e22d4d3-60ba-4179-8c85-30ade2964f3c)
+
+- In `app.js`, start building out GET routes.
+- Encapsulate routing code in a router
+
+  ```js
+  const bookRouter = express.Router(); // Create a router
+  bookRouter
+    .route('/books') // Create a route
+    .get((req, res) => {
+      const response = { hello: 'This is my API' }; // A dummy object
+
+      res.json(response); // Send the response back as JSON
+      // Other options: `res.send`: send text; `res.render`: render something with a web app
+    });
+
+  app.use('/api', bookRouter); // Serve the route
+  ```
+
+- Navigate to [localhost:4000/api/books](localhost:4000/api/books)
+
+### [Wiring up to MongoDB](https://app.pluralsight.com/course-player?clipId=9714f0a3-495d-4244-902c-5728ed011df1)
+
+- Download & install MongoDB from mongodb.com
+  - Run `brew tap mongodb/brew`
+  - Run `brew install mongodb-community@4.2`
+    - [https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
+  - Run `brew services start mongodb-community@4.2`
+  - Run `mongo`
+- Goal: Be able to open up a new terminal window, type `mongod`. (actually, `mongo`)
+- Download `DataImportInstructions.txt` and `booksJson.js`
+- Run `mongo bookAPI < booksJson.js`
+- Run `npm install mongoose`
+- In `app.js`:
+
+```js
+const mongoose = require('mongoose');
+
+// ...
+
+// Create a database connection
+const db = mongoose.connect('mongodb://localhost/bookAPI');
+
+// Create a book model, which Mongo uses to drive the verbs.
+const Book = require('./models/bookModel');
+```
+
+- Create `models/bookModel.js`
+
+```js
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose; // Destructure the schema from Mongoose
+
+// Create a new bookModel schema
+const bookModel = new Schema({
+  title: { type: String },
+  author: { type: String },
+  genre: { type: String },
+  read: { type: Boolean, default: false },
+});
+
+// Export the bookModel as 'Book'
+module.exports = mongoose.model('Book', bookModel);
+```
+
+- Back in `app.js`:
+
+```js
+bookRouter.route('/books').get((req, res) => {
+  // Standard Node convention: Callback is `(error, stuff)`
+  Book.find((err, books) => {
+    // If we have an error, send that back; otherwise, send the books.
+    if (err) {
+      // Note that we're `return`ing res.send() so that we break out of the function and don't accidentally send two responses.
+      return res.send(error);
+    }
+    return res.json(books);
+  }); // Look in the Book API database in the Book collection
+  res.json(response);
+});
+app.use('/api', bookRouter);
+```
+
+- Open browser to [localhost:4000/api/books](localhost:4000/api/books)
