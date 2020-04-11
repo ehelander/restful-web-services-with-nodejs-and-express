@@ -63,27 +63,28 @@ Jonathan Mills
     - Note: no `--save`. This has been eliminated in more recent versions of Node.
     - Adds `"express": "^4.17.1"`. `^` &rarr; Will download latest version `4`.
       - To install a specific version: `npm install express@4.16.4`.
-- Create `app.js`
+- Create `app.js`:
 
-```js
-// Import Express.
-var express = require('express');
+  ```js
+  // Import Express.
+  var express = require('express');
 
-var app = express();
+  // Create an Express instance.
+  var app = express();
 
-// We need a port for Express to listen on. Get the port from an environment variable, or 3000.
-var port = process.env.PORT || 3000;
+  // We need a port for Express to listen on. Get the port from an environment variable, or 3000.
+  var port = process.env.PORT || 3000;
 
-// Handle routes: Every time we get a request to `/`, response with a function.
-app.get('/', (request, response) => {
-  response.send('Welcome to my API!');
-});
+  // Handle routes: Every time we get a request to `/`, response with a function.
+  app.get('/', (request, response) => {
+    response.send('Welcome to my API!');
+  });
 
-// Listen on our port.
-app.listen(port, () => {
-  console.log('Running on port', port);
-});
-```
+  // Listen on our port.
+  app.listen(port, () => {
+    console.log('Running on port', port);
+  });
+  ```
 
 - Fire it up
   - Run `node app.js`
@@ -147,19 +148,25 @@ app.listen(port, () => {
 
 - In `app.js`, start building out GET routes.
 - Encapsulate routing code in a router
+- In `app.js`:
 
   ```js
-  const bookRouter = express.Router(); // Create a router
+  // Create a router
+  const bookRouter = express.Router();
   bookRouter
-    .route('/books') // Create a route
+    // Create a `/books` route.
+    .route('/books')
     .get((req, res) => {
-      const response = { hello: 'This is my API' }; // A dummy object
+      // Create a dummy object.
+      const response = { hello: 'This is my API' };
 
-      res.json(response); // Send the response back as JSON
+      // Send the response back as JSON
       // Other options: `res.send`: send text; `res.render`: render something with a web app
+      res.json(response);
     });
 
-  app.use('/api', bookRouter); // Serve the route
+  // Serve the route.
+  app.use('/api', bookRouter);
   ```
 
 - Navigate to [localhost:4000/api/books](localhost:4000/api/books)
@@ -178,53 +185,54 @@ app.listen(port, () => {
 - Run `npm install mongoose`
 - In `app.js`:
 
-```js
-const mongoose = require('mongoose');
+  ```js
+  // Import Mongoose.
+  const mongoose = require('mongoose');
 
-// ...
+  // ...
 
-// Create a database connection
-const db = mongoose.connect('mongodb://localhost/bookAPI');
+  // Create a database connection
+  const db = mongoose.connect('mongodb://localhost/bookAPI');
 
-// Create a book model, which Mongo uses to drive the verbs.
-const Book = require('./models/bookModel');
-```
+  // Create a book model, which Mongo uses to drive the verbs.
+  const Book = require('./models/bookModel');
+  ```
 
-- Create `models/bookModel.js`
+- Create `models/bookModel.js`:
 
-```js
-const mongoose = require('mongoose');
+  ```js
+  const mongoose = require('mongoose');
 
-const { Schema } = mongoose; // Destructure the schema from Mongoose
+  const { Schema } = mongoose; // Destructure the schema from Mongoose
 
-// Create a new bookModel schema
-const bookModel = new Schema({
-  title: { type: String },
-  author: { type: String },
-  genre: { type: String },
-  read: { type: Boolean, default: false },
-});
+  // Create a new bookModel schema
+  const bookModel = new Schema({
+    title: { type: String },
+    author: { type: String },
+    genre: { type: String },
+    read: { type: Boolean, default: false },
+  });
 
-// Export the bookModel as 'Book'
-module.exports = mongoose.model('Book', bookModel);
-```
+  // Export the bookModel as 'Book'
+  module.exports = mongoose.model('Book', bookModel);
+  ```
 
-- Back in `app.js`:
+- In `app.js`:
 
-```js
-bookRouter.route('/books').get((req, res) => {
-  // Standard Node convention: Callback is `(error, stuff)`
-  Book.find((err, books) => {
-    // If we have an error, send that back; otherwise, send the books.
-    if (err) {
-      // Note that we're `return`ing res.send() so that we break out of the function and don't accidentally send two responses.
-      return res.send(error);
-    }
-    return res.json(books);
-  }); // Look in the Book API database in the Book collection
-  res.json(response);
-});
-app.use('/api', bookRouter);
-```
+  ```js
+  bookRouter.route('/books').get((req, res) => {
+    // Standard Node convention: Callback is `(error, stuff)`
+    Book.find((err, books) => {
+      // If we have an error, send that back; otherwise, send the books.
+      if (err) {
+        // Note that we're `return`ing res.send() so that we break out of the function and don't accidentally send two responses.
+        return res.send(error);
+      }
+      return res.json(books);
+    }); // Look in the Book API database in the Book collection
+    res.json(response);
+  });
+  app.use('/api', bookRouter);
+  ```
 
 - Open browser to [localhost:4000/api/books](localhost:4000/api/books)
