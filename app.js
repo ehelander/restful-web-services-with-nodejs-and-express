@@ -13,32 +13,13 @@ const port = process.env.PORT || 3000;
 // Create a book model, which Mongo uses to drive the verbs.
 const Book = require('./models/bookModel');
 
-app.use(bodyParser.urlencoder({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 // Pull JSON out of the body
 app.use(bodyParser.json());
 
 // Create a route
-bookRouter.route('/books').get((req, res) => {
-  // Create an object from the query string - but only for the `genre` parameter.
-  const { query } = {};
-  if (req.query.genre) {
-    query.genre = req.query.genre;
-  }
-  // Look in the Book API database in the Book collection
-  // Standard Node convention: Callback is `(error, stuff)`
-  Book.find(query, (err, books) => {
-    // If we have an error, send that back; otherwise, send the books.
-    if (err) {
-      // Note that we're `return`ing res.send() so that we break out of the function
-      // and don't accidentally send two responses.
-      return res.send(err);
-    }
-    return res.json(books);
-  });
-});
-// The `/:bookId` gives us a `bookId` variable we can reference.
 bookRouter
-  .route('/books/:bookId')
+  .route('/books')
   .post((req, res) => {
     // Create a new Mongoose Book object
     const book = new Book(req.body);
@@ -47,14 +28,33 @@ bookRouter
     return res.json(book);
   })
   .get((req, res) => {
-    // Use `findById` instead; use the `bookId` param.
-    Book.findById(req.params.bookId, (err, book) => {
+    // Create an object from the query string - but only for the `genre` parameter.
+    const { query } = {};
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+    // Look in the Book API database in the Book collection
+    // Standard Node convention: Callback is `(error, stuff)`
+    Book.find(query, (err, books) => {
+      // If we have an error, send that back; otherwise, send the books.
       if (err) {
+        // Note that we're `return`ing res.send() so that we break out of the function
+        // and don't accidentally send two responses.
         return res.send(err);
       }
-      return res.json(book);
+      return res.json(books);
     });
   });
+// The `/:bookId` gives us a `bookId` variable we can reference.
+bookRouter.route('/books/:bookId').get((req, res) => {
+  // Use `findById` instead; use the `bookId` param.
+  Book.findById(req.params.bookId, (err, book) => {
+    if (err) {
+      return res.send(err);
+    }
+    return res.json(book);
+  });
+});
 // Serve the route
 app.use('/api', bookRouter);
 

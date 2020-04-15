@@ -326,7 +326,7 @@ const bodyParser = require('body-parser');
 
 // ...
 
-app.use(bodyParser.urlencoder({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 // Pull JSON out of the body
 app.use(bodyParser.json());
 
@@ -354,4 +354,26 @@ bookRouter
   });
 ```
 
-- Download
+### [Testing with Postman](https://app.pluralsight.com/course-player?clipId=4254b0a6-a06f-4344-aed1-caa8ba03b16f)
+
+- We'll use Postman to handle our API calls.
+- Download [Postman](https://www.postman.com/).
+- Send a request to get the list of books:
+  - GET `localhost:4000/api/books`
+- Send a request to get a specific book:
+  - GET `localhost:4000/api/books/5e92303babc885b4634c9436`
+- Send a request to create a book:
+
+  - POST `localhost:4000/api/books`
+  - Body > raw
+
+    ```json
+    {
+      "title": "Jon's Book",
+      "genre": "Fiction",
+      "author": "Jon Mills"
+    }
+    ```
+
+  - Change `Text` to `JSON` (which automatically sets the `Content-Type` header to `application/json`)
+  - The call succeeds; but we're not persisting it yet.
