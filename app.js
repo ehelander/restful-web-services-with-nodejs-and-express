@@ -1,5 +1,6 @@
 const express = require('express'); // Import Express.
 const mongoose = require('mongoose'); // Import Mongoose.
+const bodyParser = require('body-parser');
 
 // Create an Express instance.
 const app = express();
@@ -11,6 +12,10 @@ const bookRouter = express.Router();
 const port = process.env.PORT || 3000;
 // Create a book model, which Mongo uses to drive the verbs.
 const Book = require('./models/bookModel');
+
+app.use(bodyParser.urlencoder({ extended: true }));
+// Pull JSON out of the body
+app.use(bodyParser.json());
 
 // Create a route
 bookRouter.route('/books').get((req, res) => {
@@ -32,15 +37,24 @@ bookRouter.route('/books').get((req, res) => {
   });
 });
 // The `/:bookId` gives us a `bookId` variable we can reference.
-bookRouter.route('/books/:bookId').get((req, res) => {
-  // Use `findById` instead; use the `bookId` param.
-  Book.findById(req.params.bookId, (err, book) => {
-    if (err) {
-      return res.send(err);
-    }
+bookRouter
+  .route('/books/:bookId')
+  .post((req, res) => {
+    // Create a new Mongoose Book object
+    const book = new Book(req.body);
+    // eslint-disable-next-line no-console
+    console.log(book);
     return res.json(book);
+  })
+  .get((req, res) => {
+    // Use `findById` instead; use the `bookId` param.
+    Book.findById(req.params.bookId, (err, book) => {
+      if (err) {
+        return res.send(err);
+      }
+      return res.json(book);
+    });
   });
-});
 // Serve the route
 app.use('/api', bookRouter);
 

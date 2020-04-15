@@ -311,3 +311,47 @@ Jonathan Mills
 - Open browser: [http://localhost:4000/api/books/5e92303babc885b4634c9436](http://localhost:4000/api/books/5e92303babc885b4634c9436)
 
 ### [Summary](https://app.pluralsight.com/course-player?clipId=4cb80ef9-0957-4afb-896e-d831ab944d0d)
+
+## Posting Data
+
+### [Introduction](https://app.pluralsight.com/course-player?clipId=ac8ab997-a18a-40e3-9758-c194d8d8b1bc)
+
+### [Parsing POST data with Body Parser](https://app.pluralsight.com/course-player?clipId=34d8e6ae-1048-4959-adc6-83a818655951)
+
+- Run `npm install body-parser`
+- In `app.js`: Add a new `post` verb to the `/books` route:
+
+```js
+const bodyParser = require('body-parser');
+
+// ...
+
+app.use(bodyParser.urlencoder({ extended: true }));
+// Pull JSON out of the body
+app.use(bodyParser.json());
+
+// ...
+
+bookRouter
+  .route('/books')
+  .post((req, res) => {
+    // Create a new Mongoose Book object
+    const book = new Book(req.body);
+    console.log(book);
+    return res.json(book);
+  })
+  .get((req, res) => {
+    const { query } = {};
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+    Book.find(query, (err, books) => {
+      if (err) {
+        return res.send(err);
+      }
+      return res.json(books);
+    });
+  });
+```
+
+- Download
