@@ -14,18 +14,18 @@ const port = process.env.PORT || 3000;
 const Book = require('./models/bookModel');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-// Pull JSON out of the body
+// Pull JSON out of the body.
 app.use(bodyParser.json());
 
-// Create a route
+// Create a route.
 bookRouter
   .route('/books')
   .post((req, res) => {
-    // Create a new Mongoose Book object
     const book = new Book(req.body);
-    // eslint-disable-next-line no-console
-    console.log(book);
-    return res.json(book);
+    // Save the book.
+    book.save();
+    // Return a 201 status in addition to the book.
+    return res.status(201).json(book);
   })
   .get((req, res) => {
     // Create an object from the query string - but only for the `genre` parameter.

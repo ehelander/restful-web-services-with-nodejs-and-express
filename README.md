@@ -327,7 +327,7 @@ const bodyParser = require('body-parser');
 // ...
 
 app.use(bodyParser.urlencoded({ extended: true }));
-// Pull JSON out of the body
+// Pull JSON out of the body.
 app.use(bodyParser.json());
 
 // ...
@@ -335,7 +335,7 @@ app.use(bodyParser.json());
 bookRouter
   .route('/books')
   .post((req, res) => {
-    // Create a new Mongoose Book object
+    // Create a new Mongoose Book object.
     const book = new Book(req.body);
     console.log(book);
     return res.json(book);
@@ -377,3 +377,31 @@ bookRouter
 
   - Change `Text` to `JSON` (which automatically sets the `Content-Type` header to `application/json`)
   - The call succeeds; but we're not persisting it yet.
+
+### [Saving Data](https://app.pluralsight.com/course-player?clipId=40af93e6-3ceb-41e4-825b-57e8ebd707b2)
+
+- Back in app.js:
+
+```js
+  .post((req, res) => {
+    const book = new Book(req.body);
+    // Save the book.
+    book.save();
+    // Return a 201 status in addition to the book.
+    return res.status(201).json(book);
+  })
+```
+
+- Send the same POST request from earlier:
+
+  - POST `localhost:4000/api/books`
+
+    ```json
+    {
+      "title": "Jon's Book",
+      "genre": "Fiction",
+      "author": "Jon Mills"
+    }
+    ```
+
+- Verify the new book is returned in the book list (GET `localhost:4000/api/books`)
