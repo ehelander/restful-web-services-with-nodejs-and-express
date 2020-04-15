@@ -321,38 +321,38 @@ Jonathan Mills
 - Run `npm install body-parser`
 - In `app.js`: Add a new `post` verb to the `/books` route:
 
-```js
-const bodyParser = require('body-parser');
+  ```js
+  const bodyParser = require('body-parser');
 
-// ...
+  // ...
 
-app.use(bodyParser.urlencoded({ extended: true }));
-// Pull JSON out of the body.
-app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  // Pull JSON out of the body.
+  app.use(bodyParser.json());
 
-// ...
+  // ...
 
-bookRouter
-  .route('/books')
-  .post((req, res) => {
-    // Create a new Mongoose Book object.
-    const book = new Book(req.body);
-    console.log(book);
-    return res.json(book);
-  })
-  .get((req, res) => {
-    const { query } = {};
-    if (req.query.genre) {
-      query.genre = req.query.genre;
-    }
-    Book.find(query, (err, books) => {
-      if (err) {
-        return res.send(err);
+  bookRouter
+    .route('/books')
+    .post((req, res) => {
+      // Create a new Mongoose Book object.
+      const book = new Book(req.body);
+      console.log(book);
+      return res.json(book);
+    })
+    .get((req, res) => {
+      const { query } = {};
+      if (req.query.genre) {
+        query.genre = req.query.genre;
       }
-      return res.json(books);
+      Book.find(query, (err, books) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(books);
+      });
     });
-  });
-```
+  ```
 
 ### [Testing with Postman](https://app.pluralsight.com/course-player?clipId=4254b0a6-a06f-4344-aed1-caa8ba03b16f)
 
@@ -382,15 +382,15 @@ bookRouter
 
 - Back in app.js:
 
-```js
-  .post((req, res) => {
-    const book = new Book(req.body);
-    // Save the book.
-    book.save();
-    // Return a 201 status in addition to the book.
-    return res.status(201).json(book);
-  })
-```
+  ```js
+    .post((req, res) => {
+      const book = new Book(req.body);
+      // Save the book.
+      book.save();
+      // Return a 201 status in addition to the book.
+      return res.status(201).json(book);
+    })
+  ```
 
 - Send the same POST request from earlier:
 
@@ -405,3 +405,78 @@ bookRouter
     ```
 
 - Verify the new book is returned in the book list (GET `localhost:4000/api/books`)
+
+### [Code Cleanup](https://app.pluralsight.com/course-player?clipId=e37bce3e-514a-4299-8137-4d4e278d9e43)[Injecting the Book Model](https://app.pluralsight.com/course-player?clipId=4f37014b-4976-4115-b06f-e8e4cf83509d)
+
+- In `app.js`, import bookRouter.
+
+  ```js
+  // const bookRouter = express.Router();
+  // Note that we need to pass in the Book model.
+  const bookRouter = require('./routes/bookRouter')(Book);
+  ```
+
+- Create `routes/bookRouter.js`:
+
+  ```js
+  const express = require('express');
+
+  // Paste in all the router code from app.js.
+  // Pass in the Book model.
+  function routes(Book) {
+    // We need to create a bookRouter.
+    const bookRouter = express.Router();
+    bookRouter
+      .route('/books')
+      .post((req, res) => {
+        const book = new Book(req.body);
+        book.save();
+        return res.status(201).json(book);
+      })
+      .get((req, res) => {
+        const { query } = {};
+        if (req.query.genre) {
+          query.genre = req.query.genre;
+        }
+        Book.find(query, (err, books) => {
+          if (err) {
+            return res.send(err);
+          }
+          return res.json(books);
+        });
+      });
+    bookRouter.route('/books/:bookId').get((req, res) => {
+      Book.findById(req.params.bookId, (err, book) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(book);
+      });
+    });
+    // And we need to return the bookRouter now.
+    return bookRouter;
+  }
+
+  // Export the function.
+  module.exports = routes;
+  ```
+
+- Send a new request:
+
+  - POST `localhost:4000/api/books`:
+
+    ```json
+    {
+      "title": "Jon's Book Sequel",
+      "genre": "Fiction",
+      "author": "Jon Mills"
+    }
+    ```
+
+- Get the list of books and the newly-created book to verify it succeeded.
+
+### [Summary](https://app.pluralsight.com/course-player?clipId=d4925d66-8b68-426c-8a91-fb0fc08e0222)
+
+## Updating Data
+
+### [Introduction](https://app.pluralsight.com/course-player?clipId=7ef727f9-e7de-4a43-a8a8-87902cff35c5)
