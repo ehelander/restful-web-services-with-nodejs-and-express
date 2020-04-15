@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 
-const { Schema } = mongoose; // Destructure the schema from Mongoose
+const { Schema } = mongoose;
 
-// Create a new bookModel schema
 const bookModel = new Schema({
   title: { type: String },
   author: { type: String },
@@ -10,5 +9,4 @@ const bookModel = new Schema({
   read: { type: Boolean, default: false },
 });
 
-// Export the bookModel as 'Book'
 module.exports = mongoose.model('Book', bookModel);

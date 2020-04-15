@@ -406,7 +406,7 @@ Jonathan Mills
 
 - Verify the new book is returned in the book list (GET `localhost:4000/api/books`)
 
-### [Code Cleanup](https://app.pluralsight.com/course-player?clipId=e37bce3e-514a-4299-8137-4d4e278d9e43)[Injecting the Book Model](https://app.pluralsight.com/course-player?clipId=4f37014b-4976-4115-b06f-e8e4cf83509d)
+### [Code Cleanup](https://app.pluralsight.com/course-player?clipId=e37bce3e-514a-4299-8137-4d4e278d9e43) & [Injecting the Book Model](https://app.pluralsight.com/course-player?clipId=4f37014b-4976-4115-b06f-e8e4cf83509d)
 
 - In `app.js`, import bookRouter.
 
