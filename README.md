@@ -480,3 +480,40 @@ Jonathan Mills
 ## Updating Data
 
 ### [Introduction](https://app.pluralsight.com/course-player?clipId=7ef727f9-e7de-4a43-a8a8-87902cff35c5)
+
+- PUT: Replace an item
+- PATCH: Only update the specific parts of the resource that are sent to the API.
+- DELETE: Delete
+
+### [Implementing PUT](https://app.pluralsight.com/course-player?clipId=87d835b9-44d2-4f4c-9c27-913fa09b5fcc)
+
+- In `bookRouter.js`:
+
+  ```js
+  bookRouter
+    .route('/books/:bookId')
+    .get((req, res) => {
+      Book.findById(req.params.bookId, (err, book) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(book);
+      });
+    })
+    .put((req, res) => {
+      // Find the book.
+      Book.findById(req.params.bookId, (err, book) => {
+        if (err) {
+          return res.send(err);
+        }
+        // Note that these violate eslint-disable no-param-reassign.
+        book.title = req.body.title;
+        book.author = req.body.author;
+        book.genre = req.body.genre;
+        book.read = req.body.read;
+        // Save our changes.
+        book.save();
+        return res.json(book);
+      });
+    });
+  ```

@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const express = require('express');
 
 function routes(Book) {
@@ -21,14 +22,32 @@ function routes(Book) {
         return res.json(books);
       });
     });
-  bookRouter.route('/books/:bookId').get((req, res) => {
-    Book.findById(req.params.bookId, (err, book) => {
-      if (err) {
-        return res.send(err);
-      }
-      return res.json(book);
+  bookRouter
+    .route('/books/:bookId')
+    .get((req, res) => {
+      Book.findById(req.params.bookId, (err, book) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(book);
+      });
+    })
+    .put((req, res) => {
+      // Find the book.
+      Book.findById(req.params.bookId, (err, book) => {
+        if (err) {
+          return res.send(err);
+        }
+        // Note that these violate eslint-disable no-param-reassign.
+        book.title = req.body.title;
+        book.author = req.body.author;
+        book.genre = req.body.genre;
+        book.read = req.body.read;
+        // Save our changes.
+        book.save();
+        return res.json(book);
+      });
     });
-  });
   return bookRouter;
 }
 
