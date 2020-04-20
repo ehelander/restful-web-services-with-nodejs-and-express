@@ -563,3 +563,47 @@ Jonathan Mills
     });
   });
   ```
+
+### [Implementing PATCH](https://app.pluralsight.com/course-player?clipId=16dc664a-0cb6-407a-b444-48ecb9244ef8)
+
+- In `bookRouter.js`:
+
+  ```js
+  bookRouter
+    .route('/books/:bookId')
+    .get((req, res) => res.json(req.book))
+    .put((req, res) => {
+      const { book } = req;
+      book.title = req.body.title;
+      book.author = req.body.author;
+      book.genre = req.body.genre;
+      book.read = req.body.read;
+      req.book.save((err) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(book);
+      });
+    });
+    .patch((req, res) => {
+      const { book } = req;
+      // If the `_id` was included in the request, remove it.
+      // Note that this violates eslint no-underscore-dangle
+      if (req.body._id) {
+        delete req.body._id;
+      }
+      // Loop through the entries in the response. Add them to the book.
+      Object.entries(req.body).forEach((item) => {
+        const key = item[0];
+        const value = item[1];
+        book[key] = value;
+      });
+      // Save the book.
+      req.book.save((err) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(book);
+      });
+    });
+  ```
