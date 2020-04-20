@@ -517,3 +517,9 @@ Jonathan Mills
       });
     });
   ```
+
+### [Testing PUT](https://app.pluralsight.com/course-player?clipId=c3d6c87c-40d6-4d3d-98c1-495032464b8f)
+
+- PUT: `localhost:4000/api/books/{id}`
+- Change title to `John's New Book Sequel`
+- Note that `_id` is a Mongo-inserted value.
