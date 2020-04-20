@@ -523,3 +523,43 @@ Jonathan Mills
 - PUT: `localhost:4000/api/books/{id}`
 - Change title to `John's New Book Sequel`
 - Note that `_id` is a Mongo-inserted value.
+
+### [Middleware](https://app.pluralsight.com/course-player?clipId=ef973e46-50ac-4339-97b3-d9ee872f7cde)
+
+- We've been repeating `Book.findById()` in `bookRouter.js`.
+- Middleware injects itself between the client sending a request and the route receiving the request.
+- Above `bookRouter.route('/books/:bookId')`:
+
+  ```js
+  // Use middleware only for this route.
+  // The middleware uses the 'next' function to signal it has completed processing and should move on to the next thing.
+  bookRouter.use('/books/:bookId', (req, res, next) => {
+    Book.findById(req.params.bookId, (err, book) => {
+      if (err) {
+        return res.send(err);
+      }
+      // If the book exists, pass it downstream by adding it to the request.
+      if (book) {
+        req.book = book;
+        // Call `next()` to signal we're done. Return it so we exit.
+        return next();
+      }
+      // If we don't find the book, return a 404.
+      return res.sendStatus(404);
+    });
+      });
+  bookRouter
+    .route('/books/:bookId')
+      // For our GET, we know errors have already been handled and the book is on the request.
+    .get((req, res) => res.json(req.book))
+    .put((req, res) => {
+      const { book } = req;
+        book.title = req.body.title;
+        book.author = req.body.author;
+        book.genre = req.body.genre;
+        book.read = req.body.read;
+        book.save();
+        return res.json(book);
+    });
+  });
+  ```
