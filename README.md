@@ -855,7 +855,95 @@ Jonathan Mills
 
 - Run `npm test`
 
-### Integration Tests
+### [Integration Tests](https://app.pluralsight.com/course-player?clipId=ec983707-bf5b-4a27-8c00-87a51c2ea8ee)
+
+- Run `npm install supertest -D`
+- In `app.js`:
+
+  ```js
+  // So that we can access app in our integration tests.
+  module.exports = app;
+  ```
+
+- Create `tests/booksIntegrationTests.js`:
+
+  ```js
+  require('should');
+
+  const request = require('supertest');
+  const mongoose = require('mongoose');
+
+  process.env.ENV = 'Test';
+
+  const app = require('../app.js');
+
+  const Book = mongoose.model('Book');
+
+  // We need our supertest agent to run the app.
+  const agent = request.agent(app);
+
+  describe('Book Crud Test', () => {
+    // We'll call the `done` callback when we're done so supertest knows the test is complete.
+    it('should allow a book to be posted and return red and _id', (done) => {
+      const bookPost = {
+        title: 'My Book',
+        author: 'Jon',
+        genre: 'Fiction',
+      };
+
+      agent
+        .post('/api/books')
+        .send(bookPost)
+        .expect(200)
+        .end((err, results) => {
+          console.log('results');
+          results.body.read.should.not.equal(false);
+          results.body.should.have.property('_id');
+          done();
+        });
+    });
+
+    // We're adding data to the database. We want to clean up after ourselves.
+    afterEach((done) => {
+      Book.deleteMany({}).exec();
+      done();
+    });
+  });
+  ```
+
+- In `app.js`:
+
+  ```js
+  if (process.env.ENV === 'Test') {
+    console.log('This is a test');
+    const db = mongoose.connect('mongodb://localhost/bookAPI_Test');
+  } else {
+    console.log('This is for real');
+    const db = mongoose.connect('mongodb://localhost/bookAPI-prod');
+  }
+  ```
+
+- Run `npm t`. It passes, when we expected it to fail.
+- Note that our Mongoose connection is still open and our app is still listening on its port. We want these to close at the end of our test (so the test stops).
+- In `app.js`:
+
+```js
+// Add app.server so that we can access it (to close it) from our tests.
+app.server = app.listen(port, () => {
+  console.log(`Running on port ${port}`);
+});
+```
+
+- In `booksIntegrationTests.js`:
+
+  ```js
+  // ...
+  after(done => {
+    mongoose.connection.close();
+    app.server.close(done());
+  }
+  // ...
+  ```
 
 ### Summary
 
