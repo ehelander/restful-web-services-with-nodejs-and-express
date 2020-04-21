@@ -68,6 +68,15 @@ function routes(Book) {
         }
         return res.json(book);
       });
+    })
+    .delete((req, res) => {
+      req.book.remove((err) => {
+        if (err) {
+          return res.send(err);
+        }
+        // Since there is no book to return, send a 204 indicating it was removed successfully.
+        return res.sendStatus(204);
+      });
     });
   return bookRouter;
 }

@@ -607,3 +607,67 @@ Jonathan Mills
       });
     });
   ```
+
+### [Testing PATCH](https://app.pluralsight.com/course-player?clipId=405d27b8-5595-4c48-b9c0-3d6f159264ac)
+
+- PATCH `localhost:4000/api/books/5e9e2c82f3938a1e3c0fb677`
+
+  ```json
+  {
+    "read": true
+  }
+  ```
+
+### [Implementing DELETE](https://app.pluralsight.com/course-player?clipId=1f037a56-0ab8-448f-94d9-c7c31a10d52c)
+
+- In `bookRouter.js`:
+
+  ```js
+  function routes(Book) {
+    const bookRouter = express.Router();
+    // ...
+    bookRouter
+      .route('/books/:bookId')
+      // ...
+      .delete((req, res) => {
+        req.book.remove((err) => {
+          if (err) {
+            return res.send(err);
+          }
+          // Since there is no book to return, send a 204 indicating it was removed successfully.
+          return res.sendStatus(204);
+        });
+      });
+    return bookRouter;
+  }
+  ```
+
+- DELETE `localhost:4000/api/books/5e9e2c82f3938a1e3c0fb677`
+
+### Summary
+
+## Testing
+
+### Introduction
+
+### Controllers
+
+### Postman and Bugs
+
+### Testing with Mocha
+
+### Running Tests
+
+### Integration Tests
+
+### Summary
+
+## HATEOAS
+
+### Introduction
+
+### Navigating Your API
+
+### Adding Hyperlinks
+
+### Summary
