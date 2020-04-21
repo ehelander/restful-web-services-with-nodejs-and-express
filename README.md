@@ -750,11 +750,110 @@ Jonathan Mills
   module.exports = booksController;
   ```
 
-### Postman and Bugs
+### [Postman and Bugs](https://app.pluralsight.com/course-player?clipId=4ec4d609-88ff-4e20-bcdd-df7d778281e5)
 
-### Testing with Mocha
+- Right now, we can POST a new book without a title.
 
-### Running Tests
+### [Testing with Mocha](https://app.pluralsight.com/course-player?clipId=1fb64b4f-9bf6-4727-9dc4-2d55a5aaba1e)
+
+- Create a new `tests` directory.
+- Create `tests/booksControllerTests.js`;
+- Run `npm install -D mocha should sinon`
+  - `mocha`: testing framework
+  - `should`: assertion framework
+  - `sinon`: for mocking
+- In `booksControllerTests.js`:
+
+  ```js
+  // We don't need a reference to mocha, because the test will run inside the mocha framework.
+  const should = require('should');
+  const sinon = require('sinon');
+  const bookController = require('../controllers/booksController');
+
+  // Similar to BDD style
+  describe('Book Controller Tests:', () => {
+    describe('Post', () => {
+      it('should not allow an empty title on post', () => {
+        // This would be more complicated with a type-safe language.
+        // For our purposes, we just need an object with a `save` method.
+        const Book = function (book) {
+          this.save = () => {};
+        };
+
+        const req = {
+          body: {
+            author: 'Jon',
+          },
+        };
+
+        const res = {
+          status: sinon.spy(),
+          send: sinon.spy(),
+          json: sinon.spy(),
+        };
+
+        const controller = booksController(Book);
+        controller.post(req, res);
+
+        res.status
+          .calledWith(400)
+          .should.equal(true, `Bad Status ${res.status.args[0][0]}`);
+        res.send.calledWith('Title is required').should.equal(true);
+      });
+    });
+  });
+  ```
+
+- In `.eslintrc.js`, we may need to add the following to resolve eslint errors.
+
+  ```js
+  module.exports = {
+    // ...
+    env: {
+      node: true,
+      mocha: true,
+    },
+    // ...
+  };
+  ```
+
+### [Running Tests](https://app.pluralsight.com/course-player?clipId=c4e5268f-d2c8-47d1-b9b6-26b9193bd637)
+
+- In `package.json`:
+
+  ```json
+  {
+    // ...
+    "scripts": {
+      // ...
+      "test": "mocha tests/**/*Tests.js"
+    }
+    // ...
+  }
+  ```
+
+- In `booksController`:
+
+  ```js
+  function booksController(Book) {
+    function post(req, res) {
+      const book = new Book(req.body);
+      // Return a 400 if no title is included.
+      if (!req.body.title) {
+        res.status(400);
+        return res.send('Title is required');
+      }
+      book.save();
+      // Separate these two calls so testing them is more straightforward.
+      // return res.status(201).json(book);
+      res.status(201);
+      return res.json(book);
+    }
+    // ...
+  }
+  ```
+
+- Run `npm test`
 
 ### Integration Tests
 
