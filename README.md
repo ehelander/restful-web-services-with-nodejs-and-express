@@ -648,9 +648,107 @@ Jonathan Mills
 
 ## Testing
 
-### Introduction
+### [Introduction](https://app.pluralsight.com/course-player?clipId=50f070df-d4a9-4a06-bd28-a708c3c5f8d6)
 
-### Controllers
+- We've implemented the HTTP verbs, but we're not _truly_ restful yet because we haven't implemented hypermedia.
+- We'll separate our code into controllers to make testing our routes easier.
+
+### [Controllers](https://app.pluralsight.com/course-player?clipId=0cb5574d-8876-4e6b-a115-87f206f8b4a5)
+
+- We want to move the route anonymous functions into a controller.
+- In `bookRouter.js`:
+
+  ```js
+  const express = require('express');
+  // Pull in booksController (not created yet).
+  const booksController = require('../controllers/booksController');
+
+  function routes(Book) {
+    const bookRouter = express.Router();
+    bookRouter
+      .route('/books')
+      // .post((req, res) => {
+      //   const book = new Book(req.body);
+      //   book.save();
+      //   return res.status(201).json(book);
+      // })
+      // Replace the anonymous function for `.post` with `controller.post`
+      .post(controller.post)
+      .get((req, res) => {
+        const { query } = {};
+        if (req.query.genre) {
+          query.genre = req.query.genre;
+        }
+        Book.find(query, (err, books) => {
+          if (err) {
+            return res.send(err);
+          }
+          return res.json(books);
+        });
+      });
+  ```
+
+- Create `controllers/booksController.js`:
+
+  ```js
+  // Pass in the book when it's first created.
+  function booksController(Book) {
+    function post(req, res) {
+      // Paste the anonymous function we removed from bookRouter.
+      const book = new Book(req.body);
+      book.save();
+      return res.status(201).json(book);
+    }
+  }
+
+  module.exports = booksController;
+  ```
+
+- In `bookRouter.js`:
+
+  ```js
+  const express = require('express');
+  const booksController = require('../controllers/booksController');
+
+  function routes(Book) {
+    const bookRouter = express.Router();
+    // Pass Book into our controller.
+    const controller = booksController(Book);
+    bookRouter
+      .route('/books')
+      .post(controller.post)
+      // Move .get over to our controller.
+      .get(controller.get);
+  }
+  ```
+
+- In `booksController`:
+
+  ```js
+  function booksController(Book) {
+    function post(req, res) {
+      const book = new Book(req.body);
+      book.save();
+      return res.status(201).json(book);
+    }
+    function get(req, res) {
+      const { query } = {};
+      if (req.query.genre) {
+        query.genre = req.query.genre;
+      }
+      Book.find(query, (err, books) => {
+        if (err) {
+          return res.send(err);
+        }
+        return res.json(books);
+      });
+    }
+    // The revealing module pattern: The controller returns the list of exposed functions.
+    return { post, get };
+  }
+
+  module.exports = booksController;
+  ```
 
 ### Postman and Bugs
 
