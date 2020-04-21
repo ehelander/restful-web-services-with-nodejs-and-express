@@ -945,14 +945,74 @@ app.server = app.listen(port, () => {
   // ...
   ```
 
-### Summary
+### [Summary](https://app.pluralsight.com/course-player?clipId=691b4dad-de3e-4acf-bdcd-24eb5896f0c1)
 
 ## HATEOAS
 
-### Introduction
+### [Introduction](https://app.pluralsight.com/course-player?clipId=249950fa-5201-492e-a8f3-8aefba2f00aa)
 
-### Navigating Your API
+- **H**ypermedia **a**s **t**he **e**ngine **o**f **a**pplication **s**tate
+- Using hypermedia can help us build a self-documenting API.
 
-### Adding Hyperlinks
+### [Navigating Your API](https://app.pluralsight.com/course-player?clipId=e154d06f-5b5b-4a9b-aa13-948fabcc14ce)
 
-### Summary
+- `http://localhost:4000/api/books` returns a list of books.
+- `http://localhost:4000/api/books/{bookId}` returns an individual book. But how are users supposed to know this?
+
+### [Adding Hyperlinks](https://app.pluralsight.com/course-player?clipId=3694a6eb-1d55-489c-97a8-e4f846487080)
+
+- In `booksController.js`:
+
+  ```js
+  function booksController(Book) {
+    // ...
+    function get(req, res) {
+      const { query } = {};
+      if (req.query.genre) {
+        query.genre = req.query.genre;
+      }
+      Book.find(query, (err, books) => {
+        if (err) {
+          return res.send(err);
+        }
+        const returnBooks = books.map((book) => {
+          // Strip out mongoose-specific things.
+          const newBook = book.toJSON();
+          // Add a `links` section.
+          newBook.links = {};
+          newBook.links.self = `http://${req.headers.host}/api/books/${books._id}`;
+          return newBook;
+        });
+        return res.json(returnBooks);
+      });
+    }
+    return { post, get };
+  }
+
+  module.exports = booksController;
+  ```
+
+- `http://localhost:4000/api/books` returns a list of books with links to the individual books.
+
+- In `bookRouter.js`:
+
+  ```js
+  function routes(Book) {
+    const bookRouter = express.Router();
+    const controller = booksController(Book);
+    // ...
+    bookRouter.route('/books/:bookId').get((req, res) => {
+      const returnBook = req.book.toJSON();
+      returnBook.links = {};
+      const genre = req.book.genre.replace(' ', '%20');
+      returnBooks.links.FilterByThisGenre = `http://${req.headers.host}/api/books/?genre=${genre}`;
+      return res.json(returnBook);
+    });
+    // ...
+    return bookRouter;
+  }
+
+  module.exports = routes;
+  ```
+
+### [Summary](https://app.pluralsight.com/course-player?clipId=77393f2f-06e3-4ddb-ba92-dd1e5bc7438d)
